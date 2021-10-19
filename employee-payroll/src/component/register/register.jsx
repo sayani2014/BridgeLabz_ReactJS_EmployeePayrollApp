@@ -9,28 +9,27 @@ import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-// import AdapterDateFns from '@mui/lab/AdapterDateFns';
-// import LocalizationProvider from '@mui/lab/LocalizationProvider';
-// import DatePicker from '@mui/lab/DatePicker';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+const httpService = require('../../service/employee-service/employee');
 
 function valuetext(value) {
     return `${value}`;
 }
 
-// const [value, setValue] = React.useState(new Date());
-
-export default class register extends React.Component {
-    
+export default class Register extends React.Component {
+  
     constructor(props) {
         super(props)
 
         this.state = {
             empName: '',
-            department: new Map(),
+            department: [],
             profilePic: '',
             empGender: '',
             empSalary: '',
-            startDate: '',
+            startDate: new Date(),
             note: '',
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
@@ -39,6 +38,7 @@ export default class register extends React.Component {
         this.changeDepartmentHandler = this.changeDepartmentHandler.bind(this);
         this.changeSalaryHandler = this.changeSalaryHandler.bind(this);
         this.changeNoteHandler = this.changeNoteHandler.bind(this);
+        this.changeStartDateHandler = this.changeStartDateHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
     }
     
@@ -60,11 +60,10 @@ export default class register extends React.Component {
         });
     }
 
-    changeDepartmentHandler = (e) => {
-        var isChecked = e.target.checked;  
+    changeDepartmentHandler = (e) => { 
         var item = e.target.value;  
            
-        this.setState(prevState => ({ department: prevState.department.set(item, isChecked) }));  
+        this.setState(prevState => ({ department: [...prevState.department, item] })); 
     }
 
     changeSalaryHandler = (e) => {
@@ -79,6 +78,12 @@ export default class register extends React.Component {
         });
     }
 
+    changeStartDateHandler = (date) => {
+        this.setState({
+            startDate: date 
+        });
+    }
+
     saveEmployee = (e) => {
         e.preventDefault();
         console.log(this.state);
@@ -88,15 +93,15 @@ export default class register extends React.Component {
             empGender: this.state.empGender,
             department: this.state.department,
             empSalary: this.state.empSalary,
+            startDate: this.state.startDate,
             note: this.state.note,
         }
        
-        // UserService.RegisterSerivce(reqPayload).then((data) => {
-        //     console.log(data);
-
-        // }).catch((error) => {
-        //     console.log(error);
-        // })
+        httpService.addEmployee(employee).then((data) => {
+            console.log(data);
+        }).catch((error) => {
+            console.log(error);
+        })
     }
 
     departments = [
@@ -166,8 +171,8 @@ export default class register extends React.Component {
 
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Department</FormLabel>
-                        { this.departments.map( (department) =>
-                                <FormControlLabel control={<Checkbox />} label={department.name}  
+                        { this.departments.map( (department, i) =>
+                                <FormControlLabel control={<Checkbox />} label={department.name} key={i} 
                                         value={department.name} onChange={this.changeDepartmentHandler} />
                         )}
                     </div>
@@ -188,28 +193,19 @@ export default class register extends React.Component {
 
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Start Date</FormLabel> 
-                        {/* <LocalizationProvider  dateAdapter={AdapterDateFns}>
-                            <DatePicker
-                                disableFuture
-                                label="Responsive"
-                                openTo="year"
-                                views={['year', 'month', 'day']}
-                                value={value}
-                                onChange={(newValue) => {
-                                    setValue(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                            />
-                        </LocalizationProvider> */}
+                        <DatePicker
+                            selected={ this.state.startDate }
+                            onChange={ this.changeStartDateHandler }
+                        />
                     </div> 
 
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Notes</FormLabel>
                         <TextField fullWidth 
-                        id="outlined-multiline-static"
-                        label="Notes"
-                        multiline
-                        rows={4} value={this.state.note} onChange={this.changeNoteHandler}
+                            id="outlined-multiline-static"
+                            label="Notes"
+                            multiline
+                            rows={4} value={this.state.note} onChange={this.changeNoteHandler}
                         />
                     </div>
 

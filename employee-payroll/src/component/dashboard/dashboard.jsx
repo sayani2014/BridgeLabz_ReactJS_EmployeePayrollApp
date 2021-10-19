@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './dashboard.css';
+import Moment from 'react-moment';
+
 const httpService = require('../../service/employee-service/employee');
 
 export default class dashboard extends Component {
@@ -15,13 +17,21 @@ export default class dashboard extends Component {
         httpService.getAllEmployees().then(data => {
             this.employeeCount = data.data.data.length;
             this.setState({ employees : data.data.data });
-        });
+        }).catch((error) => {
+            console.log(error);
+        })
     }
 
     remove(id) {
         httpService.deleteEmployee(id).then(data => {
           this.componentDidMount();      
-        });
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
+    update(employee) {
+        console.log("Hi");
     }
              
     render() {
@@ -66,20 +76,23 @@ export default class dashboard extends Component {
                                             <td> 
                                                 { employee.department
                                                     .map(
-                                                        (dept) => 
-                                                            <div className="dept-label">
+                                                        (dept, i) => 
+                                                            <div className="dept-label" key={i}>
                                                                 {dept}  
                                                             </div>
                                                     ) 
                                                 }
                                             </td>
                                             <td> { employee.empSalary } </td>
-                                            <td> { employee.startDate } </td>
+                                            <td> 
+                                                <Moment format="DD MMM YYYY"> 
+                                                    {employee.startDate}
+                                                </Moment>  
+                                            </td>
                                             <td>
                                                 <img id={employee.empId} onClick={ () => this.remove(employee.empId)}
-                                                    src="../assets/icons/delete-black-18dp.svg"
-                                                    alt="delete" />
-                                                <img id={employee.empId} click="this.update(employee)"
+                                                    src="../assets/icons/delete-black-18dp.svg" alt="delete" />
+                                                <img id={employee.empId} onClick={ () => this.update(employee)}
                                                     src="../assets/icons/create-black-18dp.svg" alt="edit" />
                                             </td>
                                         </tr>
