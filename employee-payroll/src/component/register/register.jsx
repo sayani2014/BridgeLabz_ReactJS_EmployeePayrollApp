@@ -1,5 +1,6 @@
 import * as React from "react";
 import './register.css';
+import { Link } from 'react-router-dom'
 import TextField from '@mui/material/TextField';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -61,9 +62,10 @@ export default class Register extends React.Component {
     }
 
     changeDepartmentHandler = (e) => { 
-        var item = e.target.value;  
-           
-        this.setState(prevState => ({ department: [...prevState.department, item] })); 
+        var item = e.target.value; 
+        if(e.target.checked) {
+            this.setState(prevState => ({ department: [...prevState.department, item] })); 
+        }
     }
 
     changeSalaryHandler = (e) => {
@@ -86,7 +88,6 @@ export default class Register extends React.Component {
 
     saveEmployee = (e) => {
         e.preventDefault();
-        console.log(this.state);
         let employee = {
             empName: this.state.empName,
             profilePic: this.state.profilePic,
@@ -102,34 +103,42 @@ export default class Register extends React.Component {
         }).catch((error) => {
             console.log(error);
         })
+        this.props.history.push('/');
+    }
+
+    resetForm = () => {
+        this.setState({
+            empName: '',
+            department: [],
+            profilePic: '',
+            empGender: '',
+            empSalary: '',
+            startDate: new Date(),
+            note: '',
+        });
     }
 
     departments = [
         {
-          name:"HR",
-          value:"HR", 
+          name:"HR"
         },
         {
-          name:"Sales",
-          value:"Sales", 
+          name:"Sales"
         },
         {
-          name:"Finance",
-          value:"Finance", 
+          name:"Finance"
         },
         {
-          name:"Engineer",
-          value:"Engineer", 
+          name:"Engineer"
         },
         {
-          name:"Other",
-          value:"Other", 
+          name:"Other"
         },
     ]
 
     render() {
         return(
-            <div>
+            <div class="form-content">
                 <form className="form">
                     <div className="form-head">
                         Employee Payroll form 
@@ -172,7 +181,7 @@ export default class Register extends React.Component {
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Department</FormLabel>
                         { this.departments.map( (department, i) =>
-                                <FormControlLabel control={<Checkbox />} label={department.name} key={i} 
+                                <FormControlLabel control={<Checkbox />} label={department.name} key={i}
                                         value={department.name} onChange={this.changeDepartmentHandler} />
                         )}
                     </div>
@@ -181,7 +190,6 @@ export default class Register extends React.Component {
                         <FormLabel component="legend" className="label text">Choose your Salary</FormLabel>
                         <Box sx={{ width: 1000 }}>
                         <Slider 
-                            defaultValue={400000}
                             getAriaValueText={valuetext}
                             valueLabelDisplay="auto"
                             step={1000}
@@ -193,7 +201,10 @@ export default class Register extends React.Component {
 
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Start Date</FormLabel> 
-                        <DatePicker
+                        <DatePicker 
+                            filterDate={d => {
+                                return new Date() > d;
+                            }}
                             selected={ this.state.startDate }
                             onChange={ this.changeStartDateHandler }
                         />
@@ -211,12 +222,10 @@ export default class Register extends React.Component {
 
 
                     <div className="buttonParent">
-                        <a href="/">
-                            <Button variant="outlined" className="button cancelButton">Cancel</Button>
-                        </a>
+                        <Button component={Link} to="/" variant="outlined" className="button cancelButton">Cancel</Button>
                         <div className="submit-reset">
-                            <Button variant="outlined" className="button submitButton" onClick={this.saveEmployee}>Submit</Button>
-                            <Button type="reset" variant="outlined" className="button resetButton">Reset</Button>
+                            <Button variant="outlined" className="button submitButton" onClick={this.saveEmployee}>Submit</Button> &nbsp;&nbsp;&nbsp;
+                            <Button variant="outlined" className="button resetButton" onClick={this.resetForm}>Reset</Button>
                         </div> 
                     </div>
                     

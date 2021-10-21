@@ -19,3 +19,11 @@ exports.deleteEmployee = (id) => {
   }
   return  httpService.deleteService('deleteEmployeeDetails', httpParam);
 }
+
+exports.updateEmployee = (data) => {
+  let  httpHeader = { headers: {
+      'Content-Type':'application/json'
+    }
+  }
+  return  httpService.putService('updateEmployeeDetails', data, false, httpHeader);
+}

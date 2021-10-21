@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import './dashboard.css';
 import Moment from 'react-moment';
+import Popup from '../popup/popup';
 
 const httpService = require('../../service/employee-service/employee');
 
 export default class dashboard extends Component {
     
-    constructor(props) {
-        super(props)
+    constructor() {
+        super()
         this.state = {
-            employees: []
+            employees: [],
+            open: false,
+            empObj: null
         }
     }
 
@@ -30,8 +33,17 @@ export default class dashboard extends Component {
         })
     }
 
-    update(employee) {
-        console.log("Hi");
+    openDailog = (employee) => {
+        this.setState({ 
+            open: !this.state.open, 
+            empObj: employee
+        })
+    }
+
+    closeDailog = () => {
+        this.setState({ 
+            open: !this.state.open 
+        })
     }
              
     render() {
@@ -92,7 +104,7 @@ export default class dashboard extends Component {
                                             <td>
                                                 <img id={employee.empId} onClick={ () => this.remove(employee.empId)}
                                                     src="../assets/icons/delete-black-18dp.svg" alt="delete" />
-                                                <img id={employee.empId} onClick={ () => this.update(employee)}
+                                                <img id={employee.empId} onClick={ () => this.openDailog(employee)}
                                                     src="../assets/icons/create-black-18dp.svg" alt="edit" />
                                             </td>
                                         </tr>
@@ -102,6 +114,7 @@ export default class dashboard extends Component {
                         </table>
                     </div>
                 </div>
+                <Popup openDailogB={this.state.open} employee={this.state.empObj} closeD={this.closeDailog}></Popup>
             </div>
         )
     }
