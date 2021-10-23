@@ -15,10 +15,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const httpService = require('../../service/employee-service/employee');
 
-function valuetext(value) {
-    return `${value}`;
-}
-
 export default class Register extends React.Component {
   
     constructor(props) {
@@ -92,18 +88,16 @@ export default class Register extends React.Component {
             empName: this.state.empName,
             profilePic: this.state.profilePic,
             empGender: this.state.empGender,
-            department: this.state.department,
+            department: [...new Set(this.state.department)],
             empSalary: this.state.empSalary,
             startDate: this.state.startDate,
             note: this.state.note,
         }
-       
         httpService.addEmployee(employee).then((data) => {
-            console.log(data);
+            this.props.history.push('/');
         }).catch((error) => {
             console.log(error);
         })
-        this.props.history.push('/');
     }
 
     resetForm = () => {
@@ -181,7 +175,7 @@ export default class Register extends React.Component {
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Department</FormLabel>
                         { this.departments.map( (department, i) =>
-                                <FormControlLabel control={<Checkbox />} label={department.name} key={i}
+                                <FormControlLabel control={<Checkbox />} label={department.name} key={i} 
                                         value={department.name} onChange={this.changeDepartmentHandler} />
                         )}
                     </div>
@@ -190,7 +184,6 @@ export default class Register extends React.Component {
                         <FormLabel component="legend" className="label text">Choose your Salary</FormLabel>
                         <Box sx={{ width: 1000 }}>
                         <Slider 
-                            getAriaValueText={valuetext}
                             valueLabelDisplay="auto"
                             step={1000}
                             min={300000}

@@ -14,7 +14,7 @@ exports.deleteService = (url, httpParam) => {
     return axios.delete(baserUrl + url, httpParam);
 }
 
-exports.putService = (url, data, token = false, httpheaders) => {
-    return axios.post(baserUrl + url, data, token && httpheaders)
+exports.putService = (url, data, token = false, httpheaders, httpParam) => {
+    return axios.put(baserUrl + url, data, httpParam, token && httpheaders)
 }
 

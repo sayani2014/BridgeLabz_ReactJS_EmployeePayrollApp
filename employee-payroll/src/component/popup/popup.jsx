@@ -18,28 +18,34 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const httpService = require('../../service/employee-service/employee');
 
-function valuetext(value) {
-    return `${value}`;
-}
-
 export default function Popup({ openDailogB, employee, closeD })  {
-   
+  
     const departments = [
         {
-          name:"HR"
-        },
-        {
-          name:"Sales"
-        },
-        {
-          name:"Finance"
-        },
-        {
-          name:"Engineer"
-        },
-        {
-          name:"Other"
-        },
+            name:"HR",
+            value:"HR", 
+            checked:false
+          },
+          {
+            name:"Sales",
+            value:"Sales", 
+            checked:false
+          },
+          {
+            name:"Finance",
+            value:"Finance", 
+            checked:false
+          },
+          {
+            name:"Engineer",
+            value:"Engineer", 
+            checked:false
+          },
+          {
+            name:"Other",
+            value:"Other", 
+            checked:false
+          },
     ]
 
     const { empName, department, profilePic, empGender, empSalary, startDate, note } = employee || {};
@@ -54,9 +60,10 @@ export default function Popup({ openDailogB, employee, closeD })  {
 
     const handleClose = () => {
         closeD();
+        window.location.reload(false);
     };
 
-    const editEmployee = (e) => {
+    let editEmployee = (e) => {
         e.preventDefault();
         let employeeDetails = {
             empName: name,
@@ -67,13 +74,12 @@ export default function Popup({ openDailogB, employee, closeD })  {
             startDate: date,
             note: notes,
         }
-        console.log(employeeDetails);
-        // httpService.updateEmployee(employeeDetails).then((data) => {
-        //     console.log(data);
-        // }).catch((error) => {
-        //     console.log(error);
-        // })
-        closeD();
+        httpService.updateEmployee(employeeDetails, employee.empId).then((data) => {
+            console.log(data);
+        }).catch((error) => {
+            console.log(error);
+        })
+        handleClose();
     }
 
     React.useEffect( () => {
@@ -81,7 +87,7 @@ export default function Popup({ openDailogB, employee, closeD })  {
     },[empName])
 
     React.useEffect( () => {
-        setDepartment(department)
+        setDepartment(department);
     },[department])
 
     React.useEffect( () => {
@@ -104,14 +110,23 @@ export default function Popup({ openDailogB, employee, closeD })  {
         setNote(note)
     },[note])
 
-    const editNameHandler = (e) => {
-        setEmpName(e.target.value)
+    const getChecked = (department) => {
+        department.checked=!department.checked;
+        return dept && dept.includes(department.name);
     }
 
     const editDepartmentHandler = (e) => {
         var item = e.target.value; 
         if(e.target.checked) {
-            setDepartment(...item); 
+            setDepartment(department => [...department, item]); 
+        } else {
+            let i = 0;
+            dept.map((item) => {
+                if (item === e.target.value) {
+                    dept.splice(i,1);
+                }
+                i++;
+            });
         }
     }
 
@@ -143,7 +158,7 @@ export default function Popup({ openDailogB, employee, closeD })  {
                     <div className="row-content row-content1">
                         <FormLabel component="legend" className="label text">Name</FormLabel>
                         <TextField fullWidth id="outlined-basic" label="Your Name" size="small" variant="outlined" 
-                                value={name} onChange={editNameHandler}/>
+                                value={name} />
                     </div>                  
                
                     <div className="row-content">
@@ -177,8 +192,8 @@ export default function Popup({ openDailogB, employee, closeD })  {
                     <div className="row-content">
                         <FormLabel component="legend" className="label text">Department</FormLabel>
                         { departments.map( (department, i) =>
-                                <FormControlLabel control={<Checkbox />} label={department.name} key={i} 
-                                        value={dept} onChange={(e) => editDepartmentHandler(e)}/>
+                                <FormControlLabel control={<Checkbox />} label={department.name} key={i} checked={getChecked(department)}
+                                                value={department.name} onChange={ (e) => editDepartmentHandler(e) }/>
                         )}
                     </div>
 
@@ -186,7 +201,6 @@ export default function Popup({ openDailogB, employee, closeD })  {
                         <FormLabel component="legend" className="label text">Choose your Salary</FormLabel>
                         <Box sx={{ width: 1000 }}>
                         <Slider 
-                            getAriaValueText={valuetext}
                             valueLabelDisplay="auto"
                             step={1000}
                             min={300000}
